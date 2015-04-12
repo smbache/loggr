@@ -16,7 +16,7 @@ log_file("path/to/logfile.log")
 Then, whenever a log event (by default, `simpleMessage`s, `simpleWarning`s,
 and `simpleError`s are considered log events) is signalled, it will be logged
 to the specified file, until the handler is removed (this happens when an
-error is raised, either `simpleError`, or a `CRITITCAL` log event).
+error is raised, either `simpleError`, or a `CRITICAL` log event).
 
 To signal a log event, use one of the following
 ```R
