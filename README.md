@@ -27,7 +27,7 @@ log_error(message)     # ERROR  (will not break code execution)
 log_critical(message)  # CRITICAL   (breaks code execution)
 ```
 
-# Specifying log events
+# Specifying which events to log
 It is possible to log only certain events when they are raised when specifying
 the log file:
 ```R
