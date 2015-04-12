@@ -48,7 +48,7 @@ log_file <- function(file_name, ...,
   writer_list <- vector("list", length(classes))
   names(writer_list) <- classes
   for (i in seq_along(classes)){
-    writer_list[[i]] <- log_event_writer
+    writer_list[[i]] <- event_writer
   }
 
   writer_list <- c(writer_list, list(simpleMessage = event_writer,
