@@ -21,11 +21,12 @@ log_event <- function(level, message, ...)
   level <- toupper(level)
 
   if (!level %in% event_types &&
-      !level %in% classic_types)
+      !level %in% classic_types) {
     stop(sprintf(msg,
                  paste(event_types, collapse = ", "),
                  paste(classic_types, collapse = ", ")),
          call. = FALSE)
+  }
 
   structure(
     class = c(level, "log_event", "condition"),
