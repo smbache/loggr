@@ -48,3 +48,8 @@ log_file("/path/to/file.log", .formatter = my_formatter)
 Where `my_formatter` should accept a `log_event` as argument, and
 return a character representation.
 
+# How it works
+`loggr` builds on R's existing condition system, and the log functions 
+signal special conditions. If a log file is setup (and condition handlers are
+activated) then the events are logged. The log functions can therefore be
+used regardless of whether a log file is specified or not.
