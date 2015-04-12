@@ -1,6 +1,8 @@
 # loggr - Logging for R
 
 NB: The loggr package is currently experimental!
+**Currently the condition handler hook is faulty, and the package is only
+working in interactive mode (and not with e.g. source).**
 
 # installation: 
 ```R
@@ -53,3 +55,8 @@ return a character representation.
 signal special conditions. If a log file is setup (and condition handlers are
 activated) then the events are logged. The log functions can therefore be
 used regardless of whether a log file is specified or not.
+
+This means that there is very little code needed in the functions where 
+signalling of log events are desired, and the "consumer" only needs to 
+specify a `log_file`.
+

@@ -53,14 +53,14 @@ log_file <- function(file_name, ...,
                    simpleWarning = f,
                    simpleError   = f)[c(.message, .warning, .error)])
 
-  p <- parent.frame()
+  e <- .GlobalEnv
 
   # Make R CMD check ignore the use of .Internal.
   internal <- eval(as.name(".Internal"))
 
   # Assign the handlers upon exiting this function. Direct
   # call would reset the handlers on exit.
-  on.exit(internal(.addCondHands(names(fl), fl, p, p, TRUE)))
+  on.exit(internal(.addCondHands(names(fl), fl, e, e, TRUE)))
 
   invisible()
 }
