@@ -27,41 +27,53 @@ log_file <- function(file_name, ...,
                           sprintf("R session %s this log file.\n", action))
   cat(.formatter(init_event), "\n", file = file_name, append = TRUE)
 
-  # capture arguments defining the classes
-  classes  <- unlist(as.character(eval(substitute(alist(...)))))
+  # capture arguments defining the subscriptions
+  subscriptions  <- unlist(as.character(eval(substitute(alist(...)))))
 
-  if (length(classes) == 0){
-    classes <- c("DEBUG", "INFO", "WARN", "ERROR", "CRITITCAL")
+  # If none are given, all are used.
+  if (length(subscriptions) == 0){
+    subscriptions <- c("DEBUG", "INFO", "WARN", "ERROR", "CRITICAL")
   }
 
-  # The actual function triggered by log events that writes to file.
-  event_writer <- function(e) {
-    le <- as_log_event(e)
-    msg <- .formatter(le)
-    # The logging itself should not break the program(s).
-    try({
-      cat(msg, "\n", file = file_name, append = TRUE)
-    })
-  }
+  # Append the classic conditions, if not deselected.
+  subscriptions <- c(subscriptions,
+                     c("simpleMessage",
+                       "simpleWarning",
+                       "simpleError")[c(.message, .warning, .error)])
 
-  # Setup the arguments for condition handler assignment.
-  writer_list <- vector("list", length(classes))
-  names(writer_list) <- classes
-  for (i in seq_along(classes)){
-    writer_list[[i]] <- event_writer
-  }
+  # Create a loggr_file object
+  loggr_file <- structure(class = "loggr_file",
+                          list(subscriptions = subscriptions,
+                               file_name     = file_name,
+                               formatter     = .formatter))
 
-  writer_list <- c(writer_list, list(simpleMessage = event_writer,
-                                     simpleWarning = event_writer,
-                                     simpleError   = event_writer)[c(.message, .warning, .error)])
-  global_environment <- .GlobalEnv
+  # Ectract any existing active loggr_files
+  loggr_files <- getOption("loggr_files")
+  file_names  <- vapply(loggr_files, `[[`, character(1L), i = "file_name")
+
+  # If the file is already active, overwrite with new setup.
+  if (file_name %in% file_names)
+    loggr_files[[which(file_names == file_name)]] <- loggr_file
+  else # otherwise append it
+    loggr_files <- append(loggr_files, list(loggr_file))
+
+  # Replace the list
+  options(loggr_files = loggr_files)
 
   # Make R CMD check ignore the use of .Internal.
   internal <- eval(as.name(".Internal"))
 
-  # Assign the handlers upon exiting this function. Direct
+  # Assign the handler upon exiting this function if currently inactive. Direct
   # call would reset the handlers on exit.
-  on.exit(internal(.addCondHands(names(writer_list), writer_list, global_environment, global_environment, TRUE)))
+  if (!handler_is_set())
+    on.exit({
+      internal(.addCondHands("condition",
+                             list(condition = log_handler),
+                             .GlobalEnv,
+                             .GlobalEnv,
+                             TRUE))
+      })
+
 
   invisible()
 }

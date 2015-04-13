@@ -1,8 +1,10 @@
 # loggr - Logging for R
 
-NB: The loggr package is currently experimental!
-**Currently the condition handler hook is faulty, and the package is only
-working in interactive mode (and not with e.g. source).**
+**NB:** 
+
+* The loggr package is currently experimental!
+* loggr exports/masks `source` to allow sourced files to also activate the 
+logging handler.
 
 # installation: 
 ```R
@@ -59,4 +61,12 @@ used regardless of whether a log file is specified or not.
 This means that there is very little code needed in the functions where 
 signalling of log events are desired, and the "consumer" only needs to 
 specify a `log_file`.
+
+# Note on `source`
+Before sourcing a file that relies on `loggr` make sure to import `loggr::source`
+which activates logging for the sourced file, and redirects to `base::source`.
+Either do this with a call to `library`, or issue the command `source <- loggr::source`, or use the `import` package. This only needs to be done
+once in a session, and sourcing files, e.g. from within Rstudio will work 
+as expected.
+
 

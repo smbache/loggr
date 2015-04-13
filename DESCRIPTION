@@ -1,7 +1,7 @@
 Package: loggr
 Type: Package
 Title: Logging for R
-Version: 0.1
+Version: 0.2
 Author: Stefan Milton Bache
 Maintainer: Stefan Milton Bache <stefan@stefanbache.dk>
 Description: Log events and conditions signalled in R scripts

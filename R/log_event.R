@@ -12,7 +12,7 @@
 #' @return A log event (condition)
 log_event <- function(level, message, ...)
 {
-  event_types <- c("INFO", "WARN", "DEBUG", "ERROR", "CRITICAL")
+  event_types   <- c("INFO", "WARN", "DEBUG", "ERROR", "CRITICAL")
   classic_types <- c("SIMPLEERROR", "SIMPLEWARNING", "SIMPLEMESSAGE")
 
   msg <- paste("Invalid subclass. Possible choices are: %s; ",
