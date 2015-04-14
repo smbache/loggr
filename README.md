@@ -8,7 +8,7 @@ logging handler.
 
 # installation: 
 ```R
-devtools::install_github("smbache/loggr@with_source")
+devtools::install_github("smbache/loggr")
 ```
 
 # usage:
