@@ -2,7 +2,8 @@
 
 NB: The loggr package is currently experimental!
 **Currently the condition handler hook is faulty, and the package is only
-working in interactive mode (and not with e.g. source).**
+working in interactive mode (and not with e.g. source). A solution to this is proposed
+In the `with_source` branch.**
 
 # installation: 
 ```R
