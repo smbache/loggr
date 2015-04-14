@@ -22,6 +22,12 @@ and `simpleError`s are considered log events) is signalled, it will be logged
 to the specified file, until the handler is removed (this happens when an
 error is raised, either `simpleError`, or a `CRITICAL` log event).
 
+To listen for log events to show in the console, use of 
+```R
+logfile("console") # or
+logfile("stdout")
+```
+
 To signal a log event, use one of the following
 ```R
 log_debug(message)     # DEBUG

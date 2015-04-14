@@ -17,15 +17,19 @@ log_file <- function(file_name, ...,
                      .warning   = TRUE, .error = TRUE, .message = TRUE,
                      .formatter = format_log_entry)
 {
+  if (file_name == "")
+    stop("Please provide a valid file name.", call. = FALSE)
 
-  # Setup a new log file, or continue with existing.
-  action <- ifelse(!file.exists(file_name), "created", "continued with")
-  if (action == "created") {
-    file.create(file_name)
+  if (!file_name %in% c("stdout", "console")) {
+    # Setup a new log file, or continue with existing.
+    action <- ifelse(!file.exists(file_name), "created", "continued with")
+    if (action == "created") {
+      file.create(file_name)
+    }
+    init_event <- log_event("INFO",
+                            sprintf("R session %s this log file.\n", action))
+    cat(.formatter(init_event), "\n", file = file_name, append = TRUE)
   }
-  init_event <- log_event("INFO",
-                          sprintf("R session %s this log file.\n", action))
-  cat(.formatter(init_event), "\n", file = file_name, append = TRUE)
 
   # capture arguments defining the subscriptions
   subscriptions  <- unlist(as.character(eval(substitute(alist(...)))))

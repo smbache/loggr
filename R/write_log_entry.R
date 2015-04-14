@@ -7,6 +7,7 @@
 #'
 write_log_entry <- function(file_name, condition, formatter)
 {
+  use_file <- if (file_name %in% c("stdout", "console")) "" else file_name
   log_event <- as_log_event(condition)
-  cat(formatter(log_event), "\n", file = file_name, append = TRUE)
+  cat(formatter(log_event), "\n", file = use_file, append = TRUE)
 }
