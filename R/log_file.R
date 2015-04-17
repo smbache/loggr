@@ -20,6 +20,9 @@ log_file <- function(file_name, ...,
   if (file_name == "")
     stop("Please provide a valid file name.", call. = FALSE)
 
+  # Make sure logging hooks have been setup.
+  use_logging()
+
   if (!file_name %in% c("stdout", "console")) {
     # Setup a new log file, or continue with existing.
     action <- ifelse(!file.exists(file_name), "created", "continued with")
@@ -63,21 +66,6 @@ log_file <- function(file_name, ...,
 
   # Replace the list
   options(loggr_files = loggr_files)
-
-  # Make R CMD check ignore the use of .Internal.
-  internal <- eval(as.name(".Internal"))
-
-  # Assign the handler upon exiting this function if currently inactive. Direct
-  # call would reset the handlers on exit.
-  if (!handler_is_set())
-    on.exit({
-      internal(.addCondHands("condition",
-                             list(condition = log_handler),
-                             .GlobalEnv,
-                             .GlobalEnv,
-                             TRUE))
-      })
-
 
   invisible()
 }
