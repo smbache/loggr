@@ -17,51 +17,55 @@ log_file <- function(file_name, ...,
                      .warning   = TRUE, .error = TRUE, .message = TRUE,
                      .formatter = format_log_entry)
 {
+  if (file_name == "")
+    stop("Please provide a valid file name.", call. = FALSE)
 
-  # Setup a new log file, or continue with existing.
-  action <- ifelse(!file.exists(file_name), "created", "continued with")
-  if (action == "created") {
-    file.create(file_name)
-  }
-  init_event <- log_event("INFO",
-                          sprintf("R session %s this log file.\n", action))
-  cat(.formatter(init_event), "\n", file = file_name, append = TRUE)
+  # Make sure logging hooks have been setup.
+  use_logging()
 
-  # capture arguments defining the classes
-  classes  <- unlist(as.character(eval(substitute(alist(...)))))
-
-  if (length(classes) == 0){
-    classes <- c("DEBUG", "INFO", "WARN", "ERROR", "CRITITCAL")
-  }
-
-  # The actual function triggered by log events that writes to file.
-  event_writer <- function(e) {
-    le <- as_log_event(e)
-    msg <- .formatter(le)
-    # The logging itself should not break the program(s).
-    try({
-      cat(msg, "\n", file = file_name, append = TRUE)
-    })
+  if (!file_name %in% c("stdout", "console")) {
+    # Setup a new log file, or continue with existing.
+    action <- ifelse(!file.exists(file_name), "created", "continued with")
+    if (action == "created") {
+      file.create(file_name)
+    }
+    init_event <- log_event("INFO",
+                            sprintf("R session %s this log file.\n", action))
+    cat(.formatter(init_event), "\n", file = file_name, append = TRUE)
   }
 
-  # Setup the arguments for condition handler assignment.
-  writer_list <- vector("list", length(classes))
-  names(writer_list) <- classes
-  for (i in seq_along(classes)){
-    writer_list[[i]] <- event_writer
+  # capture arguments defining the subscriptions
+  subscriptions  <- unlist(as.character(eval(substitute(alist(...)))))
+
+  # If none are given, all are used.
+  if (length(subscriptions) == 0){
+    subscriptions <- c("DEBUG", "INFO", "WARN", "ERROR", "CRITICAL")
   }
 
-  writer_list <- c(writer_list, list(simpleMessage = event_writer,
-                                     simpleWarning = event_writer,
-                                     simpleError   = event_writer)[c(.message, .warning, .error)])
-  global_environment <- .GlobalEnv
+  # Append the classic conditions, if not deselected.
+  subscriptions <- c(subscriptions,
+                     c("simpleMessage",
+                       "simpleWarning",
+                       "simpleError")[c(.message, .warning, .error)])
 
-  # Make R CMD check ignore the use of .Internal.
-  internal <- eval(as.name(".Internal"))
+  # Create a loggr_file object
+  loggr_file <- structure(class = "loggr_file",
+                          list(subscriptions = subscriptions,
+                               file_name     = file_name,
+                               formatter     = .formatter))
 
-  # Assign the handlers upon exiting this function. Direct
-  # call would reset the handlers on exit.
-  on.exit(internal(.addCondHands(names(writer_list), writer_list, global_environment, global_environment, TRUE)))
+  # Ectract any existing active loggr_files
+  loggr_files <- getOption("loggr_files")
+  file_names  <- vapply(loggr_files, `[[`, character(1L), i = "file_name")
+
+  # If the file is already active, overwrite with new setup.
+  if (file_name %in% file_names)
+    loggr_files[[which(file_names == file_name)]] <- loggr_file
+  else # otherwise append it
+    loggr_files <- append(loggr_files, list(loggr_file))
+
+  # Replace the list
+  options(loggr_files = loggr_files)
 
   invisible()
 }

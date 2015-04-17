@@ -12,7 +12,7 @@
 #' @return A log event (condition)
 log_event <- function(level, message, ...)
 {
-  event_types <- c("INFO", "WARN", "DEBUG", "ERROR", "CRITICAL")
+  event_types   <- c("INFO", "WARN", "DEBUG", "ERROR", "CRITICAL")
   classic_types <- c("SIMPLEERROR", "SIMPLEWARNING", "SIMPLEMESSAGE")
 
   msg <- paste("Invalid subclass. Possible choices are: %s; ",
@@ -76,7 +76,5 @@ as_log_event.log_event <- function(event, ...) event
 #' @export
 as_log_event.default <- function(event, ...)
 {
-  msg <- "No conversion method for object of class %s."
-  stop(sprintf(msg, paste(class(event), collapse = ", ")) ,
-       call. = FALSE)
+  simpleWarning("Unable to convert event to a log event.")
 }

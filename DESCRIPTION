@@ -1,9 +1,14 @@
 Package: loggr
 Type: Package
-Title: Logging for R
-Version: 0.1
+Title: A Logging Framework for R
+Version: 0.3
 Author: Stefan Milton Bache
 Maintainer: Stefan Milton Bache <stefan@stefanbache.dk>
-Description: Log events and conditions signalled in R scripts
-  and programs.
+Description: The logging mechanism introduced by loggr is flexible and allows
+  for capturing both classic R conditions (simpleError, simpleWarning,
+  simpleMessage) and other log events, and for specifying multiple logging
+  devices (files and the console) each of which may listen for different
+  events.
 License: MIT + file LICENSE
+URL: https://github.com/smbache/loggr
+BugReports: https://github.com/smbache/loggr/issues
