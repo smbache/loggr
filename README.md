@@ -66,7 +66,8 @@ return a character representation.
 
 # How it works
 `loggr` adds a hook to `warning`, `stop` and `signalCondition`, so whenever 
-these functions are executed, `loggr` will be notified. The event is sent
+these functions are executed, `loggr` will be notified (Note that `message` uses
+`signalCondition` internally and does not need its own hook). The event is sent
 to any log outputs that subscribe to the type of event.
 
 This means that there is very little code needed in the functions where 
