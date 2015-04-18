@@ -1,6 +1,3 @@
-# Declare the .addCondHands function to inform R CMD check about it.
-globalVariables(".addCondHands")
-
 #' @title Activate a log file
 #'
 #' @description \code{log_file} creates an active instance
@@ -28,15 +25,16 @@ globalVariables(".addCondHands")
 #' @return NULL invisibly
 #'
 #' @examples
-#'
+#' \dontrun{
 #' #Create a "default" log file instance
 #' log_file()
 #'
 #' #Create a log file instance that only checks errors
-#' log_file("errors_only_thanks.log", .warning = FALSE, .message = FALSE)
-#'
+#' log_file("errors_only_thanks.log", ERROR, CRITICAL,
+#'          .warning = FALSE, .message = FALSE)
+#' }
 #' @export
-log_file <- function(file_name, ...,
+log_file <- function(file_name  = "console", ...,
                      .warning   = TRUE, .error = TRUE, .message = TRUE,
                      .formatter = format_log_entry, overwrite = FALSE){
 
@@ -56,15 +54,14 @@ log_file <- function(file_name, ...,
     if(!file.exists(file_name)){
       action <- "created"
       file.create(file_name)
-    } else if(file.exists(file_name) & overwrite){
+    } else if(file.exists(file_name) && overwrite) {
       action <- "created"
       file.remove(file_name)
       file.create(file_name)
     } else {
       action <- "continued with"
     }
-    init_event <- log_event("INFO", sprintf("R session %s this log file.\n", action))
-    cat(.formatter(init_event), "\n", file = file_name, append = TRUE)
+
   }
 
   # capture arguments defining the subscriptions
@@ -99,6 +96,15 @@ log_file <- function(file_name, ...,
 
   # Replace the list
   options(loggr_files = loggr_files)
+
+  if ("INFO" %in% toupper(subscriptions)) {
+    init_msg <-
+      ifelse(file_name %in% c("console", "stdout"),
+             sprintf("Activating logging in %s.", file_name),
+             sprintf("R session %s the log file '%s'.", action, file_name))
+
+    on.exit(log_info(init_msg))
+  }
 
   invisible()
 }

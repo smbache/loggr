@@ -4,14 +4,14 @@
 \alias{log_file}
 \title{Activate a log file}
 \usage{
-log_file(file_name, ..., .warning = TRUE, .error = TRUE, .message = TRUE,
-  .formatter = format_log_entry)
+log_file(file_name = "console", ..., .warning = TRUE, .error = TRUE,
+  .message = TRUE, .formatter = format_log_entry, overwrite = FALSE)
 }
 \arguments{
-\item{file_name}{character: path to the log file.}
+\item{file_name}{the path to the log file.}
 
 \item{...}{list of quoted or unquoted events to log. In none are
-provided all log events will be captured.}
+  provided all log events will be captured.}
 
 \item{.warning}{logical: capture regular warnings (\code{simpleWarning})?}
 
@@ -20,19 +20,28 @@ provided all log events will be captured.}
 \item{.message}{logical: capture regular messages (\code{simpleMessage})?}
 
 \item{.formatter}{logical: the formatting function to use to convert
-a log event to its character representation.}
+  a log event to its character representation.}
+
+\item{overwrite}{whether or not to overwrite the file at \code{file_name}
+if it already exists. Set to FALSE by default.}
 }
 \value{
 NULL invisibly
 }
 \description{
-Activate a log file
+\code{log_file} creates an active instance
+of a log file that loggr can pass errors, warnings and messages
+on to. If this file already exists, it will be appended
+to unless \code{overwrite} is set to TRUE.
 }
 \examples{
+\dontrun{
 #Create a "default" log file instance
 log_file()
 
 #Create a log file instance that only checks errors
-log_file("errors_only_thanks.log", .warning = FALSE, .message = FALSE)
+log_file("errors_only_thanks.log", ERROR, CRITICAL,
+         .warning = FALSE, .message = FALSE)
+}
 }
 
