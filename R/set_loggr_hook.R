@@ -21,16 +21,19 @@ set_loggr_hook <- function(which)
     # Reference to the environment in which
     base_env <- asNamespace("base")
 
-    # Prepare for hooking up the notifier
-    prepareForHook <- call("unlockBinding", which, base_env)
-    eval(prepareForHook)
-
     # Fetch the relevant function, and hook it up if it hasn't been done
     # already.
     fun <- getFromNamespace(which, base_env)
     if (identical(body(fun)[[2L]][[1L]], quote(`_notify_loggr`))) {
       TRUE
     } else {
+      # Prepare for hooking up the notifier
+      prepareForHook <- call("unlockBinding", which, base_env)
+      eval(prepareForHook)
+
+      # always lock the binding again.
+      on.exit(lockBinding("warning", base_env))
+
       environment(fun)[["_notify_loggr"]] <- notify_loggr
 
       # Add the notifying call
@@ -38,9 +41,6 @@ set_loggr_hook <- function(which)
 
       # Update the function
       assign(which, fun, envir = base_env)
-
-      # lock the binding again.
-      lockBinding("warning", asNamespace("base"))
 
       TRUE
     }
