@@ -28,4 +28,11 @@ NULL invisibly
 \description{
 Activate a log file
 }
+\examples{
+#Create a "default" log file instance
+log_file()
+
+#Create a log file instance that only checks errors
+log_file("errors_only_thanks.log", .warning = FALSE, .message = FALSE)
+}
 
