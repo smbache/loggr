@@ -32,7 +32,7 @@ set_loggr_hook <- function(which)
       eval(prepareForHook)
 
       # always lock the binding again.
-      on.exit(lockBinding("warning", base_env))
+      on.exit(lockBinding(which, base_env))
 
       environment(fun)[["_notify_loggr"]] <- notify_loggr
 
