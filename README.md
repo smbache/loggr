@@ -27,8 +27,8 @@ to the specified file.
 
 To listen for log events to show in the console, use of 
 ```R
-logfile("console") # or
-logfile("stdout")
+log_file("console") # or
+log_file("stdout")
 ```
 
 To signal a log event, use one of the following
