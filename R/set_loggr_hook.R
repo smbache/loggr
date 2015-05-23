@@ -49,3 +49,33 @@ set_loggr_hook <- function(which)
     return(FALSE)
   })
 }
+
+unset_loggr_hook <- function(which)
+{
+  tryCatch({
+    base_env <- asNamespace("base")
+    fun <- getFromNamespace(which, base_env)
+    if (identical(body(fun)[[2L]][[1L]], quote(`_notify_loggr`))) {
+      prepareForHook <- call("unlockBinding", which, base_env)
+      eval(prepareForHook)
+
+      # always lock the binding again.
+      on.exit(lockBinding(which, base_env))
+
+      # NOTE: This is not possible!
+      # rm(list="_notify_loggr", envir=environment(fun))
+
+      # Drop the call
+      body(fun) <- body(fun)[[3]]
+
+      # Update the function
+      assign(which, fun, envir = base_env)
+      TRUE
+    } else {
+      TRUE
+    }
+  }, error = function(e) {
+    warning(e)
+    return(FALSE)
+  })
+}

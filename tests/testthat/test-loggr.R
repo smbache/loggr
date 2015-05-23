@@ -1,16 +1,39 @@
 context("loggr")
 
-test_that("to file", {
-  # This is just a dumping ground for now so that I have a few things
-  # to test against.  Will need splitting into units later.
+test_that("start and stop logging", {
+  expect_that(loggr_list(), equals(character(0)))
   filename <- "mylog.log"
   suppressWarnings(file.remove(filename))
   log_file(filename)
   on.exit(file.remove(filename))
+
   dat <- parse_log(readLines(filename))
   expect_that(nrow(dat), equals(1L))
   expect_that(unname(dat[, "level"]), equals("INFO"))
   expect_that(unname(dat[, "message"]), matches(filename))
+
+  str <- random_string()
+  log_info(str)
+  expect_that(last_msg(filename)[["message"]], matches(str))
+
+  expect_that(loggr_list(), equals(filename))
+  log_stop()
+  expect_that(loggr_list(), equals(character(0)))
+
+  str <- random_string()
+  log_info(str)
+  expect_that(last_msg(filename)[["message"]], not(matches(str)))
+
+  expect_that(log_stop("nofile"),
+              throws_error("Unknown loggers: nofile"))
+})
+
+test_that("to file", {
+  log_stop()
+  filename <- "mylog.log"
+  suppressWarnings(file.remove(filename))
+  log_file(filename)
+  on.exit(file.remove(filename))
 
   str <- random_string()
   message(str)
@@ -85,4 +108,7 @@ test_that("to file", {
   str <- random_string()
   tryCatch(log_info(str))
   expect_that(last_msg(filename)[["message"]], matches(str))
+
+  log_stop("console")
+  expect_that(loggr_list(), equals(filename))
 })
