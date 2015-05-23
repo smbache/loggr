@@ -9,13 +9,19 @@ log_stop <- function(names = loggr_list())
          paste(setdiff(names, all_names), collapse=", "))
   }
 
-  loggr_files <- getOption("loggr_files")[!(all_names %in% names)]
-  if (length(loggr_files) == 0L) {
-    loggr_files <- NULL
+  loggr_objects <- getOption("loggr_objects")
+  for (x in loggr_objects[all_names %in% names]) {
+    if (is.function(x$close)) {
+      x$close(x)
+    }
   }
-  options(loggr_files = loggr_files)
+  loggr_objects <- loggr_objects[!(all_names %in% names)]
+  if (length(loggr_objects) == 0L) {
+    loggr_objects <- NULL
+  }
+  options(loggr_objects = loggr_objects)
 
-  if (is.null(loggr_files)) {
+  if (is.null(loggr_objects)) {
     hooks <- c("warning", "stop", "signalCondition")
     success <- vapply(hooks, unset_loggr_hook, logical(1))
     if (!all(success)) {
@@ -28,5 +34,6 @@ log_stop <- function(names = loggr_list())
 
 # List active loggr targets:
 loggr_list <- function() {
-  vapply(getOption("loggr_files"), "[[", character(1), i = "file_name")
+  vapply(getOption("loggr_objects"), "[[", character(1), i = "name",
+         USE.NAMES=FALSE)
 }

@@ -23,10 +23,10 @@ notify_loggr <- function(..., type = "other")
   le <- as_log_event(cond)
 
   # Send log entry to subscribed log files.
-  loggr_files <- getOption("loggr_files")
-  for (lf in loggr_files) {
-    if (any(toupper(lf$subscriptions) %in% toupper(class(le)))) {
-      try(write_log_entry(lf$file_name, le, lf$formatter))
+  loggr_objects <- getOption("loggr_objects")
+  for (lo in loggr_objects) {
+    if (any(toupper(lo$subscriptions) %in% toupper(class(le)))) {
+      try(write_log_entry(lo, le))
     }
   }
 

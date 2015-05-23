@@ -1,13 +1,26 @@
 #' Write a log entry to a log file.
 #'
-#' @param file_name character: the name of the file to write to.
+#' @param object A logger object
 #' @param condition a condition which can be coersed to a log_event.
-#' @param formatter function that returns the character representation of a
-#'   log event.
-#'
-write_log_entry <- function(file_name, condition, formatter)
-{
-  use_file <- if (file_name %in% c("stdout", "console")) "" else file_name
-  log_event <- as_log_event(condition)
-  cat(formatter(log_event), "\n", file = use_file, append = TRUE)
+write_log_entry <- function(obj, condition) {
+  obj$write(obj, obj$formatter(as_log_event(condition)))
+}
+
+write_file <- function(obj, str) {
+  cat(add_trailing_newline(str), file=obj$file_name, append=TRUE)
+}
+
+write_connection <- function(obj, str) {
+  cat(add_trailing_newline(str), file=obj$con, append=TRUE)
+  if (obj$flush) {
+    flush(obj$con)
+  }
+}
+
+add_trailing_newline <- function(str) {
+  if (grepl("\n", str)) {
+    str
+  } else {
+    paste0(str, "\n")
+  }
 }
