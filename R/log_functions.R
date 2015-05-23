@@ -4,10 +4,11 @@
 #' for \code{INFO} log events will be notified.
 #'
 #' @param message character: the message to log.
+#' @param ... additional data to log (ignored by default formatter)
 #' @export
-log_info <- function(message)
+log_info <- function(message, ...)
 {
-  event <- log_event("INFO", message)
+  event <- log_event("INFO", message, ...)
   invisible(signalCondition(event))
 }
 
@@ -17,10 +18,11 @@ log_info <- function(message)
 #' for \code{ERROR} log events will be notified.
 #'
 #' @param message character: the message to log.
+#' @param ... additional data to log (ignored by default formatter)
 #' @export
-log_error <- function(message)
+log_error <- function(message, ...)
 {
-  event <- log_event("ERROR", message)
+  event <- log_event("ERROR", message, ...)
   invisible(signalCondition(event))
 }
 
@@ -30,10 +32,11 @@ log_error <- function(message)
 #' for \code{DEBUG} log events will be notified.
 #'
 #' @param message character: the message to log.
+#' @param ... additional data to log (ignored by default formatter)
 #' @export
-log_debug <- function(message)
+log_debug <- function(message, ...)
 {
-  event <- log_event("DEBUG", message)
+  event <- log_event("DEBUG", message, ...)
   invisible(signalCondition(event))
 }
 
@@ -43,10 +46,11 @@ log_debug <- function(message)
 #' for \code{WARN} log events will be notified.
 #'
 #' @param message character: the message to log.
+#' @param ... additional data to log (ignored by default formatter)
 #' @export
-log_warn <- function(message)
+log_warn <- function(message, ...)
 {
-  event <- log_event("WARN", message)
+  event <- log_event("WARN", message, ...)
   invisible(signalCondition(event))
 }
 
@@ -56,10 +60,11 @@ log_warn <- function(message)
 #' for \code{CRITICAL} log events will be notified.
 #'
 #' @param message character: the message to log.
+#' @param ... additional data to log (ignored by default formatter)
 #' @export
-log_critical <- function(message)
+log_critical <- function(message, ...)
 {
-  event <- log_event("CRITICAL", message)
+  event <- log_event("CRITICAL", message, ...)
 
   stop(event)
 }

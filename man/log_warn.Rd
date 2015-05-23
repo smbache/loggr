@@ -4,10 +4,12 @@
 \alias{log_warn}
 \title{Signal a WARN event to log file handlers.}
 \usage{
-log_warn(message)
+log_warn(message, ...)
 }
 \arguments{
 \item{message}{character: the message to log.}
+
+\item{...}{additional data to log (ignored by default formatter)}
 }
 \description{
 Create and signal a WARN condition. And condition handlers listening

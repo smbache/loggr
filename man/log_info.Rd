@@ -4,10 +4,12 @@
 \alias{log_info}
 \title{Signal an info event to log file handlers.}
 \usage{
-log_info(message)
+log_info(message, ...)
 }
 \arguments{
 \item{message}{character: the message to log.}
+
+\item{...}{additional data to log (ignored by default formatter)}
 }
 \description{
 Create and signal an info condition. And condition handlers listening

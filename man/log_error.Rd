@@ -4,10 +4,12 @@
 \alias{log_error}
 \title{Signal an error event to log file handlers.}
 \usage{
-log_error(message)
+log_error(message, ...)
 }
 \arguments{
 \item{message}{character: the message to log.}
+
+\item{...}{additional data to log (ignored by default formatter)}
 }
 \description{
 Create and signal an error condition. And condition handlers listening

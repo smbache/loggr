@@ -4,10 +4,12 @@
 \alias{log_critical}
 \title{Signal a CRITICAL event to log file handlers.}
 \usage{
-log_critical(message)
+log_critical(message, ...)
 }
 \arguments{
 \item{message}{character: the message to log.}
+
+\item{...}{additional data to log (ignored by default formatter)}
 }
 \description{
 Create and signal a critical condition. And condition handlers listening

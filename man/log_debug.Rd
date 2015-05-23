@@ -4,10 +4,12 @@
 \alias{log_debug}
 \title{Signal a DEBUG event to log file handlers.}
 \usage{
-log_debug(message)
+log_debug(message, ...)
 }
 \arguments{
 \item{message}{character: the message to log.}
+
+\item{...}{additional data to log (ignored by default formatter)}
 }
 \description{
 Create and signal a debug condition. And condition handlers listening
