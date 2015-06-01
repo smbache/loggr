@@ -1,6 +1,6 @@
 #' Write a log entry to a log file.
 #'
-#' @param object A logger object
+#' @param obj A logger obj
 #' @param condition a condition which can be coersed to a log_event.
 write_log_entry <- function(obj, condition) {
   obj$write(obj, obj$formatter(as_log_event(condition)))

@@ -23,10 +23,11 @@ log_stop <- function(names = loggr_list())
 
   if (is.null(loggr_objects)) {
     hooks <- c("warning", "stop", "signalCondition")
-    success <- vapply(hooks, unset_loggr_hook, logical(1))
-    if (!all(success)) {
-      stop("Failed to remove loggr hooks.", call. = FALSE)
-    }
+    suppressMessages({
+      untrace(base::signalCondition)
+      untrace(base::stop)
+      untrace(base::warning)
+    })
   }
 
   invisible()
