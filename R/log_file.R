@@ -1,8 +1,8 @@
 #' @title Activate a log file
 #'
 #' @description \code{log_file} creates an active instance
-#' of a log file that loggr can pass errors, warnings and messages
-#' on to. If this file already exists, it will be appended
+#' of a log file to which loggr can pass errors, warnings and messages.
+#' If this file already exists, it will be appended
 #' to unless \code{overwrite} is set to TRUE.
 #'
 #' @param file_name the path to the log file.
@@ -16,13 +16,16 @@
 #'
 #' @param .message logical: capture regular messages (\code{simpleMessage})?
 #'
-#' @param .formatter logical: the formatting function to use to convert
-#'   a log event to its character representation.
+#' @param .formatter function: the formatting function used to convert
+#'   a log event to its character representation for the log file.
 #'
-#' @param overwrite whether or not to overwrite the file at \code{file_name}
-#' if it already exists. Set to FALSE by default.
+#' @param subscriptions character vector: optional list of
+#' subscriptions to use (in place of specifying with \code{...}).
 #'
-#' @return NULL invisibly
+#' @param overwrite logical: whether or not to overwrite the file at
+#' \code{file_name} if it already exists. Set to FALSE by default.
+#'
+#' @return \code{NULL}, invisibly.
 #'
 #' @examples
 #' \dontrun{
@@ -34,77 +37,129 @@
 #'          .warning = FALSE, .message = FALSE)
 #' }
 #' @export
-log_file <- function(file_name  = "console", ...,
-                     .warning   = TRUE, .error = TRUE, .message = TRUE,
-                     .formatter = format_log_entry, overwrite = FALSE){
+log_file <- function(file_name,
+                     ...,
+                     .warning      = TRUE,
+                     .error        = TRUE,
+                     .message      = TRUE,
+                     .formatter    = format_log_entry,
+                     subscriptions = NULL,
+                     overwrite     = TRUE)
+{
+  # capture arguments defining the subscriptions
+  subscriptions <- loggr_subscriptions(.warning, .error, .message, ...,
+                                       subscriptions = subscriptions)
 
-  if (!is.vector(file_name, "character") || file_name == ""){
+  if (missing(file_name)) {
+    file_name <- "console"
+  }
+
+  if (identical(file_name, "stdout") || identical(file_name, "stderr")) {
+    return(log_connection(get(file_name, baseenv())(),
+                          .formatter = .formatter,
+                          subscriptions = subscriptions, flush = FALSE))
+  }
+
+  if (!is.character(file_name) || length(file_name) != 1L) {
     stop("Please provide a valid file name.", call. = FALSE)
   }
 
+  name <- file_name
+  if (file_name == "console") {
+    file_name <- ""
+  } else if (!file.exists(file_name)) {
+    file.create(file_name)
+  } else if (file.exists(file_name) && overwrite) {
+    file.remove(file_name)
+    file.create(file_name)
+  }
+
+  obj <- list(name = name, file_name = file_name, write = write_file)
+
+  loggr_start(obj, subscriptions, .formatter)
+}
+
+log_connection <- function(con,
+                           ...,
+                           .warning      = TRUE,
+                           .error        = TRUE,
+                           .message      = TRUE,
+                           .formatter    = format_log_entry,
+                           subscriptions = NULL,
+                           flush         = TRUE)
+{
+  subscriptions <- loggr_subscriptions(.warning, .error, .message, ...,
+                                       subscriptions = subscriptions)
+
+  if (!inherits(con, "connection")) {
+    stop("Expected a connection object")
+  }
+
+  closed_on_entry <- !isOpen(con)
+  if (closed_on_entry) {
+    open(con, "a")
+  }
+
+  obj <- list(name  = summary(con)[["description"]],
+              con   = con,
+              write = write_connection,
+              flush = flush)
+
+  # Don't try and close anything that was given to us open (which
+  # includes standard connections - stdout and stderr)
+  if (closed_on_entry) {
+    obj$close <- log_connection_close
+  }
+
+  loggr_start(obj, subscriptions, .formatter)
+}
+
+log_connection_close <- function(obj) {
+  close(obj$con)
+}
+
+## Helper functions to make the above work:
+loggr_start <- function(object, subscriptions, formatter = format_log_entry)
+{
+  if (is.null(object$name) ||
+     !is.character(object$name) ||
+      length(object$name) != 1L) {
+    stop("Log object must have a name (scalar character value).", call. = FALSE)
+  }
+
+  if (is.null(object$write) || !is.function(object$write)) {
+    stop("Log object must include a `write` function.", call. = FALSE)
+  }
 
   # Make sure logging hooks have been setup.
   use_logging()
 
-  if (!file_name %in% c("stdout", "console")) {
+  object$subscriptions <- subscriptions
+  object$formatter <- formatter
 
-    #If the file doesn't exist, create it. If the file
-    #does exist, and overwrite is TRUE, delete and replace.
-    #If the file does exist and overwrite is FALSE, just append.
-    if(!file.exists(file_name)){
-      action <- "created"
-      file.create(file_name)
-    } else if(file.exists(file_name) && overwrite) {
-      action <- "created"
-      file.remove(file_name)
-      file.create(file_name)
-    } else {
-      action <- "continued with"
-    }
-
-  }
-
-  # capture arguments defining the subscriptions
-  subscriptions  <- unlist(as.character(eval(substitute(alist(...)))))
-
-  # If none are given, all are used.
-  if (length(subscriptions) == 0){
-    subscriptions <- c("DEBUG", "INFO", "WARN", "ERROR", "CRITICAL")
-  }
-
-  # Append the classic conditions, if not deselected.
-  subscriptions <- c(subscriptions,
-                     c("simpleMessage",
-                       "simpleWarning",
-                       "simpleError")[c(.message, .warning, .error)])
-
-  # Create a loggr_file object
-  loggr_file <- structure(class = "loggr_file",
-                          list(subscriptions = subscriptions,
-                               file_name     = file_name,
-                               formatter     = .formatter))
-
-  # Ectract any existing active loggr_files
-  loggr_files <- getOption("loggr_files")
-  file_names  <- vapply(loggr_files, `[[`, character(1L), i = "file_name")
-
-  # If the file is already active, overwrite with new setup.
-  if (file_name %in% file_names)
-    loggr_files[[which(file_names == file_name)]] <- loggr_file
-  else # otherwise append it
-    loggr_files <- append(loggr_files, list(loggr_file))
-
-  # Replace the list
-  options(loggr_files = loggr_files)
+  loggr_objects <- getOption("loggr_objects", list())
+  loggr_objects[[object$name]] <- object
+  options(loggr_objects = loggr_objects)
 
   if ("INFO" %in% toupper(subscriptions)) {
-    init_msg <-
-      ifelse(file_name %in% c("console", "stdout"),
-             sprintf("Activating logging in %s.", file_name),
-             sprintf("R session %s the log file '%s'.", action, file_name))
-
+    init_msg <- sprintf("Activating logging to %s", object$name)
     on.exit(log_info(init_msg))
   }
 
   invisible()
+}
+
+loggr_subscriptions <- function(.warning, .error, .message, ..., subscriptions)
+{
+  if (is.null(subscriptions)) {
+    subscriptions <- unlist(as.character(eval(substitute(alist(...)))))
+  }
+  if (length(subscriptions) == 0) {
+    subscriptions <- c("DEBUG", "INFO", "WARN", "ERROR", "CRITICAL")
+  }
+  # Append the classic conditions, if not deselected.
+  c(subscriptions,
+    c("simpleMessage",
+      "simpleWarning",
+      "simpleError")[c(.message, .warning, .error)])
 }

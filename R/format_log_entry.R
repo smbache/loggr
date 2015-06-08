@@ -13,6 +13,6 @@ format_log_entry <- function(event)
 {
   paste(c(format(event$time, "%Y-%m-%d %H:%M:%OS3"),
           event$level,
-          gsub("[\r\n]", " ", event$message)),
+          gsub("[\r\n]", " ", sub("\n+$", "", event$message))),
         collapse = " - ")
 }

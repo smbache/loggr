@@ -12,3 +12,4 @@ Description: The logging mechanism introduced by loggr is flexible and allows
 License: MIT + file LICENSE
 URL: https://github.com/smbache/loggr
 BugReports: https://github.com/smbache/loggr/issues
+Suggests: testthat
