@@ -19,8 +19,8 @@ log_file(file_name, ..., .warning = TRUE, .error = TRUE, .message = TRUE,
 
 \item{.message}{logical: capture regular messages (\code{simpleMessage})?}
 
-\item{.formatter}{function: the formatting function to use to convert
-  a log event to its character representation.}
+\item{.formatter}{function: the formatting function used to convert
+  a log event to its character representation for the log file.}
 
 \item{subscriptions}{character vector: optional list of
 subscriptions to use (in place of specifying with \code{...}).}
@@ -29,12 +29,12 @@ subscriptions to use (in place of specifying with \code{...}).}
 \code{file_name} if it already exists. Set to FALSE by default.}
 }
 \value{
-NULL invisibly
+\code{NULL}, invisibly.
 }
 \description{
 \code{log_file} creates an active instance
-of a log file that loggr can pass errors, warnings and messages
-on to. If this file already exists, it will be appended
+of a log file to which loggr can pass errors, warnings and messages.
+If this file already exists, it will be appended
 to unless \code{overwrite} is set to TRUE.
 }
 \examples{

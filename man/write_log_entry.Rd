@@ -7,9 +7,9 @@
 write_log_entry(obj, condition)
 }
 \arguments{
-\item{condition}{a condition which can be coersed to a log_event.}
+\item{obj}{A logger obj}
 
-\item{obj}{A logger object}
+\item{condition}{a condition which can be coersed to a log_event.}
 }
 \description{
 Write a log entry to a log file.

@@ -17,19 +17,19 @@ test_that("start and stop logging", {
   expect_that(last_msg(filename)[["message"]], matches(str))
 
   expect_that(loggr_list(), equals(filename))
-  log_stop()
+  deactivate_log()
   expect_that(loggr_list(), equals(character(0)))
 
   str <- random_string()
   log_info(str)
   expect_that(last_msg(filename)[["message"]], not(matches(str)))
 
-  expect_that(log_stop("nofile"),
+  expect_that(deactivate_log("nofile"),
               throws_error("Unknown loggers: nofile"))
 })
 
 test_that("to file", {
-  log_stop()
+  deactivate_log()
   filename <- "mylog.log"
   suppressWarnings(file.remove(filename))
   log_file(filename)
@@ -110,12 +110,12 @@ test_that("to file", {
   tryCatch(log_info(str))
   expect_that(last_msg(filename)[["message"]], matches(str))
 
-  log_stop("console")
+  deactivate_log("console")
   expect_that(loggr_list(), equals(filename))
 })
 
 test_that("connection", {
-  log_stop()
+  deactivate_log()
   filename <- "mylog.log"
   suppressWarnings(file.remove(filename))
   writeLines("HEADER", filename)
@@ -138,7 +138,7 @@ test_that("connection", {
   log_info(str)
   expect_that(last_msg(filename)[["message"]], matches(str))
 
-  log_stop()
+  deactivate_log()
   ## Not sure why this is the case, but it seems to be how R does things:
   ##   con <- file(filename)
   ##   open(con, "a")

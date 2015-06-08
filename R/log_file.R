@@ -1,8 +1,8 @@
 #' @title Activate a log file
 #'
 #' @description \code{log_file} creates an active instance
-#' of a log file that loggr can pass errors, warnings and messages
-#' on to. If this file already exists, it will be appended
+#' of a log file to which loggr can pass errors, warnings and messages.
+#' If this file already exists, it will be appended
 #' to unless \code{overwrite} is set to TRUE.
 #'
 #' @param file_name the path to the log file.
@@ -16,8 +16,8 @@
 #'
 #' @param .message logical: capture regular messages (\code{simpleMessage})?
 #'
-#' @param .formatter function: the formatting function to use to convert
-#'   a log event to its character representation.
+#' @param .formatter function: the formatting function used to convert
+#'   a log event to its character representation for the log file.
 #'
 #' @param subscriptions character vector: optional list of
 #' subscriptions to use (in place of specifying with \code{...}).
@@ -25,7 +25,7 @@
 #' @param overwrite logical: whether or not to overwrite the file at
 #' \code{file_name} if it already exists. Set to FALSE by default.
 #'
-#' @return NULL invisibly
+#' @return \code{NULL}, invisibly.
 #'
 #' @examples
 #' \dontrun{
@@ -37,21 +37,25 @@
 #'          .warning = FALSE, .message = FALSE)
 #' }
 #' @export
-log_file <- function(file_name, ...,
-                     .warning   = TRUE, .error = TRUE, .message = TRUE,
-                     .formatter = format_log_entry,
-                     subscriptions=NULL,
-                     overwrite=TRUE) {
+log_file <- function(file_name,
+                     ...,
+                     .warning      = TRUE,
+                     .error        = TRUE,
+                     .message      = TRUE,
+                     .formatter    = format_log_entry,
+                     subscriptions = NULL,
+                     overwrite     = TRUE)
+{
   # capture arguments defining the subscriptions
   subscriptions <- loggr_subscriptions(.warning, .error, .message, ...,
                                        subscriptions = subscriptions)
-  if (identical(file_name, "stdout")) {
-    return(log_connection(stdout(),
-                          .formatter = .formatter,
-                          subscriptions = subscriptions, flush = FALSE))
+
+  if (missing(file_name)) {
+    file_name <- "console"
   }
-  if (identical(file_name, "stderr")) {
-    return(log_connection(stderr(),
+
+  if (identical(file_name, "stdout") || identical(file_name, "stderr")) {
+    return(log_connection(get(file_name, baseenv())(),
                           .formatter = .formatter,
                           subscriptions = subscriptions, flush = FALSE))
   }
@@ -75,10 +79,14 @@ log_file <- function(file_name, ...,
   loggr_start(obj, subscriptions, .formatter)
 }
 
-log_connection <- function(con, ...,
-                           .warning   = TRUE, .error = TRUE, .message = TRUE,
-                           .formatter = format_log_entry,
-                           subscriptions=NULL, flush=TRUE)
+log_connection <- function(con,
+                           ...,
+                           .warning      = TRUE,
+                           .error        = TRUE,
+                           .message      = TRUE,
+                           .formatter    = format_log_entry,
+                           subscriptions = NULL,
+                           flush         = TRUE)
 {
   subscriptions <- loggr_subscriptions(.warning, .error, .message, ...,
                                        subscriptions = subscriptions)
@@ -86,6 +94,7 @@ log_connection <- function(con, ...,
   if (!inherits(con, "connection")) {
     stop("Expected a connection object")
   }
+
   closed_on_entry <- !isOpen(con)
   if (closed_on_entry) {
     open(con, "a")
@@ -112,8 +121,15 @@ log_connection_close <- function(obj) {
 ## Helper functions to make the above work:
 loggr_start <- function(object, subscriptions, formatter = format_log_entry)
 {
-  # TODO: Validate object; must have entries *name* and *write*; name
-  # must be scalar character, write must be a function.
+  if (is.null(object$name) ||
+     !is.character(object$name) ||
+      length(object$name) != 1L) {
+    stop("Log object must have a name (scalar character value).", call. = FALSE)
+  }
+
+  if (is.null(object$write) || !is.function(object$write)) {
+    stop("Log object must include a `write` function.", call. = FALSE)
+  }
 
   # Make sure logging hooks have been setup.
   use_logging()
