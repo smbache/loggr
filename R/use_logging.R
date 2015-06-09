@@ -14,9 +14,9 @@ use_logging <- function()
   #
   # NOTE: using quote() here triggers a false-positive NOTE in R CMD
   # check about use of ':::' to refer to a package variable.
-  catch_signal  <- parse(text="loggr:::notify_loggr(cond)")
+  catch_signal  <- parse(text='if (!inherits(cond, "message") || !loggr:::muffled(sys.frames(), "message")) loggr:::notify_loggr(cond)')
   catch_stop    <- parse(text="loggr:::notify_loggr(..., call.=call., domain=domain, type=\"error\")")
-  catch_warning <- parse(text="loggr:::notify_loggr(..., call.=call., immediate.=immediate., noBreaks.=noBreaks., domain=domain, type=\"warning\")")
+  catch_warning <- parse(text='if (!loggr:::muffled(sys.frames(), "warning")) loggr:::notify_loggr(..., call. = call., immediate. = immediate., noBreaks. = noBreaks., domain = domain, type = "warning")')
 
   suppressMessages({
     trace(base::signalCondition, catch_signal,  print=FALSE)
