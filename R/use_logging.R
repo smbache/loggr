@@ -7,21 +7,18 @@
 #' @export
 use_logging <- function()
 {
-  # message uses signalCondition and is hooked indirectly.
+  # message uses signalCondition and are hooked indirectly.
   #
   # re-tracing here is fine as it replaces the original trace (so no
   # effect).
-  #
-  # NOTE: using quote() here triggers a false-positive NOTE in R CMD
-  # check about use of ':::' to refer to a package variable.
-  catch_signal  <- parse(text='if (!inherits(cond, "message") || !loggr:::muffled(sys.frames(), "message")) loggr:::notify_loggr(cond)')
-  catch_stop    <- parse(text="loggr:::notify_loggr(..., call.=call., domain=domain, type=\"error\")")
-  catch_warning <- parse(text='if (!loggr:::muffled(sys.frames(), "warning")) loggr:::notify_loggr(..., call. = call., immediate. = immediate., noBreaks. = noBreaks., domain = domain, type = "warning")')
+  catch_signal  <- catch_signal_expr()
+  catch_stop    <- catch_stop_expr()
+  catch_warning <- catch_warning_expr()
 
   suppressMessages({
-    trace(base::signalCondition, catch_signal,  print=FALSE)
-    trace(base::stop,            catch_stop,    print=FALSE)
-    trace(base::warning,         catch_warning, print=FALSE)
+    trace("stop",            catch_stop,    print = FALSE, where = baseenv())
+    trace("warning",         catch_warning, print = FALSE, where = baseenv())
+    trace("signalCondition", catch_signal,  print = FALSE, where = baseenv())
   })
 
   invisible()

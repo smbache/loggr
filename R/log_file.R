@@ -25,6 +25,10 @@
 #' @param overwrite logical: whether or not to overwrite the file at
 #' \code{file_name} if it already exists. Set to FALSE by default.
 #'
+#' @param log_muffled logical: Log messages and warnings
+#'   even if muffled? This affects only logging as result of
+#'   \code{warning} and \code{message}.
+#'
 #' @return \code{NULL}, invisibly.
 #'
 #' @examples
@@ -39,12 +43,13 @@
 #' @export
 log_file <- function(file_name,
                      ...,
-                     .warning      = TRUE,
-                     .error        = TRUE,
-                     .message      = TRUE,
-                     .formatter    = format_log_entry,
-                     subscriptions = NULL,
-                     overwrite     = TRUE)
+                     .warning       = TRUE,
+                     .error         = TRUE,
+                     .message       = TRUE,
+                     .formatter     = format_log_entry,
+                     subscriptions  = NULL,
+                     overwrite      = TRUE,
+                     log_muffled    = FALSE)
 {
   # capture arguments defining the subscriptions
   subscriptions <- loggr_subscriptions(.warning, .error, .message, ...,
@@ -57,7 +62,9 @@ log_file <- function(file_name,
   if (identical(file_name, "stdout") || identical(file_name, "stderr")) {
     return(log_connection(get(file_name, baseenv())(),
                           .formatter = .formatter,
-                          subscriptions = subscriptions, flush = FALSE))
+                          subscriptions = subscriptions,
+                          flush = FALSE,
+                          log_muffled = log_muffled))
   }
 
   if (!is.character(file_name) || length(file_name) != 1L) {
@@ -76,7 +83,7 @@ log_file <- function(file_name,
 
   obj <- list(name = name, file_name = file_name, write = write_file)
 
-  loggr_start(obj, subscriptions, .formatter)
+  loggr_start(obj, subscriptions, .formatter, log_muffled = log_muffled)
 }
 
 log_connection <- function(con,
@@ -86,7 +93,8 @@ log_connection <- function(con,
                            .message      = TRUE,
                            .formatter    = format_log_entry,
                            subscriptions = NULL,
-                           flush         = TRUE)
+                           flush         = TRUE,
+                           log_muffled   = FALSE)
 {
   subscriptions <- loggr_subscriptions(.warning, .error, .message, ...,
                                        subscriptions = subscriptions)
@@ -111,7 +119,7 @@ log_connection <- function(con,
     obj$close <- log_connection_close
   }
 
-  loggr_start(obj, subscriptions, .formatter)
+  loggr_start(obj, subscriptions, .formatter, log_muffled)
 }
 
 log_connection_close <- function(obj) {
@@ -119,7 +127,8 @@ log_connection_close <- function(obj) {
 }
 
 ## Helper functions to make the above work:
-loggr_start <- function(object, subscriptions, formatter = format_log_entry)
+loggr_start <- function(object, subscriptions, formatter = format_log_entry,
+                        log_muffled = FALSE)
 {
   if (is.null(object$name) ||
      !is.character(object$name) ||
@@ -136,6 +145,7 @@ loggr_start <- function(object, subscriptions, formatter = format_log_entry)
 
   object$subscriptions <- subscriptions
   object$formatter <- formatter
+  object$log_muffled <- log_muffled
 
   loggr_objects <- getOption("loggr_objects", list())
   loggr_objects[[object$name]] <- object

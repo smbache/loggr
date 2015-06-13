@@ -5,7 +5,8 @@
 \title{Activate a log file}
 \usage{
 log_file(file_name, ..., .warning = TRUE, .error = TRUE, .message = TRUE,
-  .formatter = format_log_entry, subscriptions = NULL, overwrite = TRUE)
+  .formatter = format_log_entry, subscriptions = NULL, overwrite = TRUE,
+  log_muffled = FALSE)
 }
 \arguments{
 \item{file_name}{the path to the log file.}
@@ -27,6 +28,10 @@ subscriptions to use (in place of specifying with \code{...}).}
 
 \item{overwrite}{logical: whether or not to overwrite the file at
 \code{file_name} if it already exists. Set to FALSE by default.}
+
+\item{log_muffled}{logical: Log messages and warnings
+  even if muffled? This affects only logging as result of
+  \code{warning} and \code{message}.}
 }
 \value{
 \code{NULL}, invisibly.

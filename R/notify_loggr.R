@@ -5,7 +5,9 @@
 #'
 #' @param ... arguments passed to the original event.
 #' @param type character: either "warning", "error", or "other"
-notify_loggr <- function(..., type = "other")
+#' @param muffled logical: is the event muffled?
+#' @noRd
+notify_loggr <- function(..., type = "other", muffled = FALSE)
 {
   # Convert information in ... to a log_event
   args <- list(...)
@@ -25,7 +27,8 @@ notify_loggr <- function(..., type = "other")
   # Send log entry to subscribed log files.
   loggr_objects <- getOption("loggr_objects")
   for (lo in loggr_objects) {
-    if (any(toupper(lo$subscriptions) %in% toupper(class(le)))) {
+    if (any(toupper(lo$subscriptions) %in% toupper(class(le))) &&
+       (!muffled || isTRUE(lo$log_muffled))) {
       try(write_log_entry(lo, le))
     }
   }

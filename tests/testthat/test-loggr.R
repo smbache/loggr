@@ -32,7 +32,7 @@ test_that("to file", {
   deactivate_log()
   filename <- "mylog.log"
   suppressWarnings(file.remove(filename))
-  log_file(filename)
+  log_file(filename, log_muffled = TRUE)
   on.exit(file.remove(filename))
 
   str <- random_string()
@@ -94,7 +94,7 @@ test_that("to file", {
   expect_that(last_msg(filename)[["message"]], matches(str))
 
   # Add a new log, to the console:
-  expect_that(log_file("console"),
+  expect_that(log_file("console", log_muffled = TRUE),
               prints_text("INFO"))
   str <- random_string()
 
