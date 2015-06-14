@@ -14,5 +14,7 @@ log_info(message, ...)
 \description{
 Create and signal an info condition. And condition handlers listening
 for \code{INFO} log events will be notified.
+The message can be wrapped in a one sided formula, in which case
+string interpolation will be used.
 }
 

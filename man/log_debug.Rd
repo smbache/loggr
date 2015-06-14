@@ -14,5 +14,7 @@ log_debug(message, ...)
 \description{
 Create and signal a debug condition. And condition handlers listening
 for \code{DEBUG} log events will be notified.
+The message can be wrapped in a one sided formula, in which case
+string interpolation will be used.
 }
 

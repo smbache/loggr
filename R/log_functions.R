@@ -2,12 +2,15 @@
 #'
 #' Create and signal an info condition. And condition handlers listening
 #' for \code{INFO} log events will be notified.
+#' The message can be wrapped in a one sided formula, in which case
+#' string interpolation will be used.
 #'
 #' @param message character: the message to log.
 #' @param ... additional data to log (ignored by default formatter)
 #' @export
 log_info <- function(message, ...)
 {
+  message <- log_message(message)
   event <- log_event("INFO", message, ...)
   invisible(signalCondition(event))
 }
@@ -16,12 +19,15 @@ log_info <- function(message, ...)
 #'
 #' Create and signal an error condition. And condition handlers listening
 #' for \code{ERROR} log events will be notified.
+#' The message can be wrapped in a one sided formula, in which case
+#' string interpolation will be used.
 #'
 #' @param message character: the message to log.
 #' @param ... additional data to log (ignored by default formatter)
 #' @export
 log_error <- function(message, ...)
 {
+  message <- log_message(message)
   event <- log_event("ERROR", message, ...)
   invisible(signalCondition(event))
 }
@@ -30,12 +36,15 @@ log_error <- function(message, ...)
 #'
 #' Create and signal a debug condition. And condition handlers listening
 #' for \code{DEBUG} log events will be notified.
+#' The message can be wrapped in a one sided formula, in which case
+#' string interpolation will be used.
 #'
 #' @param message character: the message to log.
 #' @param ... additional data to log (ignored by default formatter)
 #' @export
 log_debug <- function(message, ...)
 {
+  message <- log_message(message)
   event <- log_event("DEBUG", message, ...)
   invisible(signalCondition(event))
 }
@@ -44,12 +53,15 @@ log_debug <- function(message, ...)
 #'
 #' Create and signal a WARN condition. And condition handlers listening
 #' for \code{WARN} log events will be notified.
+#' The message can be wrapped in a one sided formula, in which case
+#' string interpolation will be used.
 #'
 #' @param message character: the message to log.
 #' @param ... additional data to log (ignored by default formatter)
 #' @export
 log_warn <- function(message, ...)
 {
+  message <- log_message(message)
   event <- log_event("WARN", message, ...)
   invisible(signalCondition(event))
 }
@@ -58,12 +70,15 @@ log_warn <- function(message, ...)
 #'
 #' Create and signal a critical condition. And condition handlers listening
 #' for \code{CRITICAL} log events will be notified.
+#' The message can be wrapped in a one sided formula, in which case
+#' string interpolation will be used.
 #'
 #' @param message character: the message to log.
 #' @param ... additional data to log (ignored by default formatter)
 #' @export
 log_critical <- function(message, ...)
 {
+  message <- log_message(message)
   event <- log_event("CRITICAL", message, ...)
 
   stop(event)
