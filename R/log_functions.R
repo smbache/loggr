@@ -93,26 +93,28 @@ log_critical <- function(message, ...)
 #' @rdname logfunctions
 log_with_level <- function(message, ..., .level)
 {
-  args <- list(...)
+  try({
+    args <- list(...)
 
-  has_formula <- has_loggr_formula(args)
+    has_formula <- has_loggr_formula(args)
 
-  if (has_formula) {
-    # In this case message is actually a value.
-    env <- new.env(parent = environment(args[[1L]]))
-    env[["."]] <- message
-    event <- log_event(.level, log_message(args[[1L]], env), args[-1L])
-    result <- message
-  } else {
-    message <- log_message(message, parent.frame())
-    event <- log_event(.level, message, ...)
-    result <- NULL
-  }
+    if (has_formula) {
+      # In this case message is actually a value.
+      env <- new.env(parent = environment(args[[1L]]))
+      env[["."]] <- message
+      event <- log_event(.level, log_message(args[[1L]], env), args[-1L])
+      result <- message
+    } else {
+      message <- log_message(message, parent.frame())
+      event <- log_event(.level, message, ...)
+      result <- NULL
+    }
 
-  if (!identical(.level, "CRITICAL")) {
-    signalCondition(event)
-    invisible(result)
-  } else {
-    stop(event)
-  }
+    if (!identical(.level, "CRITICAL")) {
+      signalCondition(event)
+      invisible(result)
+    } else {
+      stop(event)
+    }
+  })
 }
