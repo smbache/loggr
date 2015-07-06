@@ -43,7 +43,7 @@
 log_info <- function(message, ...)
 {
   cl <- match.call()
-  cl[[1L]] <- quote(log_with_level)
+  cl[[1L]] <- call("::", quote(loggr), quote(log_with_level))
   cl[[".level"]] <- "INFO"
   eval(cl, parent.frame(), parent.frame())
 }
@@ -53,7 +53,7 @@ log_info <- function(message, ...)
 log_error <- function(message, ...)
 {
   cl <- match.call()
-  cl[[1L]] <- quote(log_with_level)
+  cl[[1L]] <- call("::", quote(loggr), quote(log_with_level))
   cl[[".level"]] <- "ERROR"
   eval(cl, parent.frame(), parent.frame())
 }
@@ -63,7 +63,7 @@ log_error <- function(message, ...)
 log_debug <- function(message, ...)
 {
   cl <- match.call()
-  cl[[1L]] <- quote(log_with_level)
+  cl[[1L]] <- call("::", quote(loggr), quote(log_with_level))
   cl[[".level"]] <- "DEBUG"
   eval(cl, parent.frame(), parent.frame())
 }
@@ -73,7 +73,7 @@ log_debug <- function(message, ...)
 log_warn <- function(message, ...)
 {
   cl <- match.call()
-  cl[[1L]] <- quote(log_with_level)
+  cl[[1L]] <- call("::", quote(loggr), quote(log_with_level))
   cl[[".level"]] <- "WARN"
   eval(cl, parent.frame(), parent.frame())
 }
@@ -83,7 +83,7 @@ log_warn <- function(message, ...)
 log_critical <- function(message, ...)
 {
   cl <- match.call()
-  cl[[1L]] <- quote(log_with_level)
+  cl[[1L]] <- call("::", quote(loggr), quote(log_with_level))
   cl[[".level"]] <- "CRITICAL"
   eval(cl, parent.frame(), parent.frame())
 }
