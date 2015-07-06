@@ -24,7 +24,7 @@ write_connection <- function(obj, str)
 
 add_trailing_newline <- function(str)
 {
-  if (grepl("\n", str)) {
+  if (grepl("\n$", str)) {
     str
   } else {
     paste0(str, "\n")
