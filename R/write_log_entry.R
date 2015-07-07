@@ -6,7 +6,7 @@ write_log_entry <- function(obj, condition)
 {
   # writing to a log object should never itself cause failure
   # in the calling software.
-  try(obj$write(obj, obj$formatter(as_log_event(condition))))
+  try(obj$write(obj, obj$formatter(as_log_event(condition))), silent = TRUE)
 }
 
 write_file <- function(obj, str)

@@ -29,7 +29,7 @@ notify_loggr <- function(..., type = "other", muffled = FALSE)
   for (lo in loggr_objects) {
     if (any(toupper(lo$subscriptions) %in% toupper(class(le))) &&
        (!muffled || isTRUE(lo$log_muffled))) {
-      try(write_log_entry(lo, le))
+      write_log_entry(lo, le)
     }
   }
 
