@@ -151,9 +151,9 @@ loggr_start <- function(object, subscriptions, formatter = format_log_entry,
   loggr_objects[[object$name]] <- object
   options(loggr_objects = loggr_objects)
 
-  if ("INFO" %in% toupper(subscriptions)) {
+  if ("DEBUG" %in% toupper(subscriptions)) {
     init_msg <- sprintf("Activating logging to %s", object$name)
-    on.exit(log_info(init_msg))
+    on.exit(log_debug(init_msg))
   }
 
   invisible()
