@@ -23,7 +23,7 @@
 #' subscriptions to use (in place of specifying with \code{...}).
 #'
 #' @param overwrite logical: whether or not to overwrite the file at
-#' \code{file_name} if it already exists. Set to FALSE by default.
+#' \code{file_name} if it already exists. Set to TRUE by default.
 #'
 #' @param log_muffled logical: Log messages and warnings
 #'   even if muffled? This affects only logging as result of
