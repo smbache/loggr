@@ -20,8 +20,18 @@ muffled <- function(frames, type)
   type_handlers <-
     lapply(handlers, `[[`, i = type)
 
+  # In R 3.4.x body throws a warning if fun == NULL. Avoid this
+  # by checking if input is NULL before body evaluates result.
+  type_handlers_helper <- function(x){
+    if(is.null(x)){
+      NULL
+    } else {
+      body(x)
+    }
+  }
+
   bodies <-
-    lapply(type_handlers, body)
+    lapply(type_handlers, type_handlers_helper)
 
   muffles <-
     lapply(bodies, identical, y = muffle)
